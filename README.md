@@ -6,4 +6,4 @@ Windows ( recommander )
 Linux 
 Macos
 
-git clone 
+git clone https://github.com/codx-off/StarPhish.git
