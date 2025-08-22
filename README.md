@@ -42,3 +42,8 @@ cd StarPhish
 
 # Installer les dépendances
 pip install flask requests
+
+## Utilisation
+
+```bash
+#
