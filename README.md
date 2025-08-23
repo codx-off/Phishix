@@ -5,7 +5,7 @@
 ![Requests](https://img.shields.io/badge/Requests-2.x-red)
 ![License](https://img.shields.io/badge/License-MIT-green)
 
-**StarPhish** est un outil **démonstratif** pour récupérer la localisation d’un utilisateur **avec consentement** via un lien web sécurisé.  
+**Phishix** est un outil **démonstratif** pour récupérer la localisation d’un utilisateur **avec consentement** via un lien web sécurisé.  
 
 > ⚠️ **Attention** : Utilisez cet outil uniquement à des fins légales et éducatives.  
 > L’utilisation pour espionner quelqu’un sans consentement est **illégale**.
