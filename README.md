@@ -48,7 +48,7 @@ pip install flask requests
 
 # Lancer le serveur
 python phishix.py
-
+```
 # 🖥️ En local
 Ouvrir :  
 [http://127.0.0.1:5000/admin](http://127.0.0.1:5000/admin)
@@ -58,3 +58,4 @@ Ouvrir :
 2. Ouvrir un terminal et taper :  
 ```bash
 ngrok http 5000
+```
