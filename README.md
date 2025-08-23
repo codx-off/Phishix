@@ -20,7 +20,7 @@
 - Envoi des coordonnées GPS précises à un webhook Discord.
 - Stockage des événements (IP, User-Agent, lat/lon, timestamp) consultables depuis le dashboard.
 - Compatible **localhost** et **ngrok** pour tests sécurisés et distants.
-- Default Password : **USERNAME** = Phishix **PASSWORD** = Phishix2025
+- Login : **USERNAME** = Phishix | **PASSWORD** = Phishix2025
 
 ---
 
