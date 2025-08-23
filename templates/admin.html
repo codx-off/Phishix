@@ -1,0 +1,55 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <title>Dashboard Admin</title>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen p-6">
+<div class="max-w-3xl mx-auto">
+
+{% if not session.logged_in %}
+  <!-- Formulaire de login -->
+  <h1 class="text-2xl font-bold mb-4">Connexion</h1>
+  <form method="post" action="{{ url_for('login') }}" class="space-y-3">
+    <label class="block text-sm">Utilisateur
+      <input name="username" class="w-full mt-1 p-2 rounded bg-slate-800">
+    </label>
+    <label class="block text-sm">Mot de passe
+      <input name="password" type="password" class="w-full mt-1 p-2 rounded bg-slate-800">
+    </label>
+    <div><button class="px-4 py-2 bg-indigo-500 rounded">Se connecter</button></div>
+  </form>
+{% else %}
+
+  <!-- Interface Admin existante -->
+  <h1 class="text-2xl font-bold mb-4">Générer un lien pour obtenir la localisation</h1>
+  <form method="post" class="space-y-3">
+    <label class="block text-sm">Label (optionnel)
+      <input name="label" class="w-full mt-1 p-2 rounded bg-slate-800">
+    </label>
+    <label class="block text-sm">Discord webhook URL
+      <input name="webhook" required class="w-full mt-1 p-2 rounded bg-slate-800">
+    </label>
+    <div><button class="px-4 py-2 bg-rose-500 rounded">Générer le lien</button></div>
+  </form>
+
+  {% if link %}
+  <div class="mt-6 p-4 bg-slate-800 rounded">
+    <div class="text-sm">Lien généré :</div>
+    <div class="mt-2 font-mono bg-black/30 p-2 rounded break-all">
+      <a class="text-indigo-300" href="{{ link }}">{{ link }}</a>
+    </div>
+  </div>
+  {% endif %}
+
+  <hr class="my-6 border-slate-700">
+  <div><a class="text-sm text-slate-300" href="/events">Voir les événements</a></div>
+  <div class="mt-2"><a class="text-sm text-red-400" href="{{ url_for('logout') }}">Se déconnecter</a></div>
+
+{% endif %}
+
+</div>
+</body>
+</html>
