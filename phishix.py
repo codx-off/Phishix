@@ -150,6 +150,8 @@ def print_banner():
             print(f"{CYAN}   Vérifie ton dashboard ngrok pour l’URL publique.{RESET}")
         else:
             print(f"{CYAN}ℹ️ Ngrok n'est pas détecté pour l'instant.{RESET}")
+            print(f"{CYAN}⚠️ Lancer Ngrok avant de démarrer phishix.py{RESET}")
+            print(f"{CYAN}⚠️ Lancer Ngrok : ngrok http 5000{RESET}")
     except:
         print(f"{CYAN}ℹ️ Impossible de vérifier ngrok.{RESET}")
 
