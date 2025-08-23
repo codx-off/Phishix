@@ -1,30 +1,32 @@
-# Phishix
+# 🐟 Phishix
 
-![Python](https://img.shields.io/badge/Python-3.10+-blue)
-![Flask](https://img.shields.io/badge/Flask-2.x-orange)
-![Requests](https://img.shields.io/badge/Requests-2.x-red)
-![License](https://img.shields.io/badge/License-MIT-green)
+![Python](https://img.shields.io/badge/Python-3.10+-blue?style=for-the-badge)
+![Flask](https://img.shields.io/badge/Flask-2.x-orange?style=for-the-badge)
+![Requests](https://img.shields.io/badge/Requests-2.x-red?style=for-the-badge)
+![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
 
-**Phishix** est un outil **démonstratif** pour récupérer la localisation d’un utilisateur **avec consentement** via un lien web sécurisé.  
+**Phishix** est un outil **démonstratif** pour récupérer la localisation d’un utilisateur **avec consentement** via un lien web sécurisé.
 
-> ⚠️ **Attention** : Utilisez cet outil uniquement à des fins légales et éducatives.  
+> ⚠️ **Attention** : Utilisez cet outil uniquement à des fins **légales et éducatives**.  
 > L’utilisation pour espionner quelqu’un sans consentement est **illégale**.
 
 ---
 
-## Fonctionnalités
+## ✨ Fonctionnalités
 
 - Dashboard administrateur local pour générer des liens de partage.
 - Page minimaliste responsive pour les visiteurs.
 - Demande automatique de géolocalisation (popup de consentement obligatoire).
-- Envoi des coordonnées GPS précises à un webhook Discord.
-- Stockage des événements (IP, User-Agent, lat/lon, timestamp) consultables depuis le dashboard.
+- Envoi des coordonnées GPS précises à un **webhook Discord**.
+- Stockage des événements (**IP, User-Agent, latitude/longitude, timestamp**) consultables depuis le dashboard.
 - Compatible **localhost** et **ngrok** pour tests sécurisés et distants.
-- Login : **USERNAME** = Phishix | **PASSWORD** = Phishix2025
+- 🔐 **Login par défaut** :  
+  - **USERNAME** = `Phishix`  
+  - **PASSWORD** = `Phishix2025`
 
 ---
 
-## Prérequis
+## ⚙️ Prérequis
 
 - Python 3.10+
 - Pip
@@ -34,7 +36,7 @@
 
 ---
 
-## Installation
+## 🚀 Installation
 
 ```bash
 # Cloner le dépôt
@@ -44,19 +46,15 @@ cd Phishix
 # Installer les dépendances
 pip install flask requests
 
-# Lancer
+# Lancer le serveur
 python phishix.py
 
-En local :
-Open http://127.0.0.1:5000/admin
+# 🖥️ En local
+Ouvrir :  
+[http://127.0.0.1:5000/admin](http://127.0.0.1:5000/admin)
 
-Avec Ngrok :
-1 - Installer ngrok
-2 - Terminal : ngrok http 5000
-3 - Open https://<ngrok_url_gen>/admin
-
-
-
-
-
-
+# 🌐 Avec Ngrok
+1. Installer ngrok  
+2. Ouvrir un terminal et taper :  
+```bash
+ngrok http 5000
