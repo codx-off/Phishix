@@ -14,7 +14,7 @@
 
 ## ✨ Fonctionnalités
 
-- Dashboard administrateur local pour générer des liens de partage.
+- Dashboard pour générer des liens de partage.
 - Page minimaliste responsive pour les visiteurs.
 - Demande automatique de géolocalisation (popup de consentement obligatoire).
 - Envoi des coordonnées GPS précises à un **webhook Discord**.
