@@ -14,12 +14,12 @@
 
 ## ✨ Fonctionnalités
 
-- Dashboard pour générer des liens de partage.
-- Page minimaliste responsive pour les visiteurs.
-- Demande automatique de géolocalisation (popup de consentement obligatoire).
+- Dashboard pour générer des url piégé.
+- Page minimaliste moderne et intuitive.
+- Demande automatique de géolocalisation (popup du navigateur).
 - Envoi des coordonnées GPS précises à un **webhook Discord**.
 - Stockage des événements (**IP, User-Agent, latitude/longitude, timestamp**) consultables depuis le dashboard.
-- Compatible **localhost** et **ngrok** pour tests sécurisés et distants.
+- Compatible **localhost** et **ngrok**
 - 🔐 **Login par défaut** :  
   - **USERNAME** = `Phishix`  
   - **PASSWORD** = `Phishix2025`
