@@ -61,3 +61,8 @@ http://127.0.0.1:5000/admin
 ```bash
 ngrok http 5000
 ```
+Ouvrir :
+```bash
+https://<ngrok_url_gen>/admin
+```
+
