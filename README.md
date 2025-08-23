@@ -38,7 +38,7 @@
 ```bash
 # Cloner le dépôt
 git clone https://github.com/codx-off/StarPhish.git
-cd StarPhish
+cd Phishix
 
 # Installer les dépendances
 pip install flask requests
