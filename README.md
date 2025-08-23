@@ -63,6 +63,6 @@ ngrok http 5000
 ```
 Ouvrir :
 ```bash
-https://<ngrok_url_gen>/admin
+https://<ton_url_ngrok>/admin
 ```
 
