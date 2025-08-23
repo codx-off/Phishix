@@ -1,0 +1,40 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <title>Événements consentis</title>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen p-6">
+<div class="max-w-6xl mx-auto">
+  <h1 class="text-2xl font-semibold mb-4">Événements consentis</h1>
+  <table class="w-full text-sm border-separate border-spacing-y-2">
+    <thead class="text-slate-300">
+      <tr>
+        <th class="text-left">Heure</th>
+        <th class="text-left">Label</th>
+        <th class="text-left">IP</th>
+        <th class="text-left">UA</th>
+        <th class="text-left">Lat/Lon (±m)</th>
+        <th class="text-left">Maps</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for e in rows %}
+      <tr class="bg-slate-900/60 rounded-xl">
+        <td class="py-2 pr-4">{{ e.ts_h }}</td>
+        <td class="py-2 pr-4">{{ e.label }}</td>
+        <td class="py-2 pr-4 font-mono">{{ e.ip }}</td>
+        <td class="py-2 pr-4 text-xs break-all">{{ e.ua }}</td>
+        <td class="py-2 pr-4 font-mono">{{ '%.5f'%e.lat }}, {{ '%.5f'%e.lon }} (±{{ e.acc|int }}m)</td>
+        <td class="py-2 pr-4">
+          <a class="text-indigo-300 underline" href="https://www.google.com/maps?q={{ e.lat }},{{ e.lon }}" target="_blank">Maps</a>
+        </td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+</body>
+</html>
