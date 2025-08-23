@@ -37,7 +37,7 @@
 
 ```bash
 # Cloner le dépôt
-git clone https://github.com/codx-off/StarPhish.git
+git clone https://github.com/codx-off/Phishix.git
 cd Phishix
 
 # Installer les dépendances
