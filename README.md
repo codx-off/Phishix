@@ -43,4 +43,19 @@ cd Phishix
 # Installer les dépendances
 pip install flask requests
 
+# Lancer
+python phishix.py
+
+En local :
+Open http://127.0.0.1:5000/admin
+
+Avec Ngrok :
+1 - Installer ngrok
+2 - Terminal : ngrok http 5000
+3 - Open https://<ngrok_url_gen>/admin
+
+
+
+
+
 
