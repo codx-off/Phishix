@@ -161,3 +161,6 @@ def print_banner():
 if __name__=="__main__":
     print_banner()
     app.run(host='127.0.0.1', port=5000, debug=False, use_reloader=False)
+# Je te rassure, il n’y a aucun malware dans ce code, il est sûr.
+# Tous droits réservés - Codx - Open Source, vente interdite
+
